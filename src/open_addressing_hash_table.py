@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import random
+import string
 
 
 class Node:
@@ -23,7 +25,7 @@ class OpenAddressingHashTable:
         return str_sum % self.capacity
 
     def __second_hash_func(self, key):
-        x = 257
+        x = 253
         p = 100_000_007
         str_sum = sum([ord(element) * x ** k % p for k, element in enumerate(key)])
         return str_sum % p % self.capacity
@@ -35,13 +37,14 @@ class OpenAddressingHashTable:
         # rh = (h + i*k) % self.capacity
 
         # quadratic probing
-        # c_1 = 0
-        # c_2 = 1
-        # rh = (h + c_1*i + c_2*(i**2)) % self.capacity
+        c_1 = 0
+        c_2 = 1
+        rh = (h + c_1*i + c_2*(i**2)) % self.capacity
 
         # double hashing probing
         # need key in input parameters
-        rh = (h + i * self.__second_hash_func(key)) % self.capacity
+        # rh = (h + i * self.__second_hash_func(key)) % self.capacity
+        print(rh)
 
         return rh
 
@@ -133,21 +136,34 @@ def main():
     odht = OpenAddressingHashTable()
 
     # need generate data for best/mean/worst case
-    inp_dict = {
-        "'": "23",
-        ":": "14",
-        "M": "3",
-        "`": "900",
-        "s": "12",
-    }
+    # inp_dict = {
+    #     "'": "23",
+    #     ":": "14",
+    #     "M": "3",
+    #     "`": "900",
+    #     "s": "12",
+    # }
+    #
+    # standard_x = np.array([5e-5, 10e-5, 15e-5, 20e-5, 25e-5])
+    # x = []
 
-    standard_x = np.array([5e-5, 10e-5, 15e-5, 20e-5, 25e-5])
+    # stress test
+    inp_dict = {}
+    letters = string.ascii_lowercase
+    keys = [''.join(random.choice(letters) for _ in range(12)) for _ in range(100000)]
+    values = [i + 1 for i in range(100000)]
+
+    for i in range(len(values)):
+        inp_dict[keys[i]] = values[i]
+
+    std_x = [1 for i in range(100000)]
+    standard_x = np.array(std_x)
     x = []
 
     for key, value in inp_dict.items():
-        # start_time = time.time()
+        start_time = time.time()
         odht.add(key, value)
-        # x.append(time.time() - start_time)
+        x.append(time.time() - start_time)
 
     for key in inp_dict.keys():
         # start_time = time.time()
@@ -155,16 +171,16 @@ def main():
         # x.append(time.time() - start_time)
 
     for key in inp_dict.keys():
-        start_time = time.time()
+        # start_time = time.time()
         odht.delete(key)
-        x.append(time.time() - start_time)
+        # x.append(time.time() - start_time)
 
     x = np.array(x)
     print(x)
     plt.plot(x, 'r', standard_x, 'b')
     plt.ylabel("time")
     plt.xlabel("step")
-    plt.title("delete_double_worst")
+    plt.title("add_quadratic")
     plt.show()
 
     # while True:

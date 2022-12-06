@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import random
+import string
 
 
 class Node:
@@ -114,47 +116,60 @@ def main():
     #
     # standard_x = np.array([5e-5, 10e-5, 15e-5, 20e-5, 25e-5])
     # x = []
-    #
-    # for key, value in inp_dict.items():
-    #     # start_time = time.time()
-    #     cht.add(key, value)
-    #     # x.append(time.time() - start_time)
-    #
-    # for key in inp_dict.keys():
-    #     # start_time = time.time()
-    #     cht.find(key)
-    #     # x.append(time.time() - start_time)
-    #
-    # for key in inp_dict.keys():
-    #     start_time = time.time()
-    #     cht.delete(key)
-    #     x.append(time.time() - start_time)
-    #
-    # x = np.array(x)
-    # print(x)
-    # plt.plot(x, 'r', standard_x, 'b')
-    # plt.ylabel("time")
-    # plt.xlabel("step")
-    # plt.title("delete_worst")
-    # plt.show()
 
-    while True:
-        inp_string = input().split()
-        command = inp_string[0]
-        number = inp_string[1]
-        if command == 'add':
-            try:
-                name = inp_string[2]
-                cht.add(number, name)
-            except IndexError:
-                print("You need to type value, try again!")
-        else:
-            if command == 'find':
-                cht.find(number)
-            elif command == 'del':
-                cht.delete(number)
-            else:
-                print("Bad command!\nType this commands:\nadd, find, del")
+    # stress test
+    inp_dict = {}
+    letters = string.ascii_lowercase
+    keys = [''.join(random.choice(letters) for _ in range(12)) for _ in range(100000)]
+    values = [i+1 for i in range(100000)]
+
+    for i in range(len(values)):
+        inp_dict[keys[i]] = values[i]
+
+    std_x = [1 for i in range(100000)]
+    standard_x = np.array(std_x)
+    x = []
+
+    for key, value in inp_dict.items():
+        start_time = time.time()
+        cht.add(key, value)
+        x.append(time.time() - start_time)
+
+    for key in inp_dict.keys():
+        # start_time = time.time()
+        cht.find(key)
+        # x.append(time.time() - start_time)
+
+    for key in inp_dict.keys():
+        # start_time = time.time()
+        cht.delete(key)
+        # x.append(time.time() - start_time)
+
+    x = np.array(x)
+    print(x)
+    plt.plot(x, 'r', standard_x, 'b')
+    plt.ylabel("time")
+    plt.xlabel("step")
+    plt.title("add")
+    plt.show()
+
+    # while True:
+    #     inp_string = input().split()
+    #     command = inp_string[0]
+    #     number = inp_string[1]
+    #     if command == 'add':
+    #         try:
+    #             name = inp_string[2]
+    #             cht.add(number, name)
+    #         except IndexError:
+    #             print("You need to type value, try again!")
+    #     else:
+    #         if command == 'find':
+    #             cht.find(number)
+    #         elif command == 'del':
+    #             cht.delete(number)
+    #         else:
+    #             print("Bad command!\nType this commands:\nadd, find, del")
 
 
 main()
