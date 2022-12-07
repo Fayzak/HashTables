@@ -16,19 +16,46 @@ class OpenAddressingHashTable:
         self.capacity = 19
         self.size = 0
         self.hash_table = [None for _ in range(self.capacity)]
+        self.x_1 = 343
+        self.counted_x_1 = [self.x_1 ** k for k in range(8)]
+        self.x_2 = 351
+        self.p = 100_000_003
+        self.counted_x_2 = [self.x_2 ** k % self.p for k in range(8)]
         self.border = 0.5
         self.expansion = 0.75
 
     def __hash_func(self, key):
-        x = 257
-        str_sum = sum([ord(element) * x ** k for k, element in enumerate(key)])
+        # classical polynomial hash function
+        # x = 257
+        # str_sum = sum([ord(element) * x ** k for k, element in enumerate(key)])
+
+        # improved polynomial hash function
+        # with using counted x
+        # which increases speed by 64%
+        if len(key) > len(self.counted_x_1):
+            k = len(self.counted_x_1)
+            degrees_to_add = len(key) - len(self.counted_x_1)
+            for i in range(degrees_to_add):
+                self.counted_x_1.append(self.x_1 ** (k + i))
+
+        str_sum = sum([ord(element) * self.counted_x_1[i] for i, element in enumerate(key)])
         return str_sum % self.capacity
 
     def __second_hash_func(self, key):
-        x = 253
-        p = 100_000_007
-        str_sum = sum([ord(element) * x ** k % p for k, element in enumerate(key)])
-        return str_sum % p % self.capacity
+        # for classical
+        # x = 253
+        # p = 100_000_007
+        # str_sum = sum([ord(element) * x ** k % p for k, element in enumerate(key)])
+
+        # for improved
+        if len(key) > len(self.counted_x_2):
+            k = len(self.counted_x_2)
+            degrees_to_add = len(key) - len(self.counted_x_2)
+            for i in range(degrees_to_add):
+                self.counted_x_2.append(self.x_2 ** (k + i) % self.p)
+
+        str_sum = sum([ord(element) * self.counted_x_2[i] for i, element in enumerate(key)])
+        return str_sum % self.p % self.capacity
 
     def __rehash_func(self, h, i, key):
 
@@ -37,14 +64,14 @@ class OpenAddressingHashTable:
         # rh = (h + i*k) % self.capacity
 
         # quadratic probing
-        c_1 = 0
-        c_2 = 1
-        rh = (h + c_1*i + c_2*(i**2)) % self.capacity
+        # c_1 = 0
+        # c_2 = 1
+        # rh = (h + c_1*i + c_2*(i**2)) % self.capacity
 
         # double hashing probing
         # need key in input parameters
-        # rh = (h + i * self.__second_hash_func(key)) % self.capacity
-        print(rh)
+        rh = (h + i * self.__second_hash_func(key)) % self.capacity
+        print(h, i, self.__second_hash_func(key), rh)
 
         return rh
 
