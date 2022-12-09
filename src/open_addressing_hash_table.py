@@ -55,7 +55,7 @@ class OpenAddressingHashTable:
                 self.counted_x_2.append(self.x_2 ** (k + i) % self.p)
 
         str_sum = sum([ord(element) * self.counted_x_2[i] for i, element in enumerate(key)])
-        return str_sum % self.p % self.capacity
+        return str_sum % self.p % (self.capacity - 1) + 1
 
     def __rehash_func(self, h, i, key):
 
@@ -71,7 +71,7 @@ class OpenAddressingHashTable:
         # double hashing probing
         # need key in input parameters
         rh = (h + i * self.__second_hash_func(key)) % self.capacity
-        print(h, i, self.__second_hash_func(key), rh)
+        print(h, i, self.__second_hash_func(key), rh, self.capacity)
 
         return rh
 
@@ -183,7 +183,7 @@ def main():
     for i in range(len(values)):
         inp_dict[keys[i]] = values[i]
 
-    std_x = [1 for i in range(100000)]
+    std_x = [1 for i in range(1000000)]
     standard_x = np.array(std_x)
     x = []
 
